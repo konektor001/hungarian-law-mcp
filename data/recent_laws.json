@@ -1,0 +1,133 @@
+[
+  {
+    "id": "hu-law-2026-48-00-00",
+    "title": "2026. évi XLVIII. törvény az általános forgalmi adóról szóló 2007. évi CXXVII. törvény módosításáról",
+    "short_name": "2026. évi XLVIII. törvény",
+    "status": "in_force",
+    "issued_date": "2026-09-15",
+    "in_force_date": "2026-09-16",
+    "url": "https://njt.hu/jogszabaly/2026-48-00-00",
+    "description": "az általános forgalmi adóról szóló 2007. évi CXXVII. törvény módosításáról",
+    "tags": [
+      "ÁFA",
+      "ADÓZÁS"
+    ]
+  },
+  {
+    "id": "hu-law-2026-49-00-00",
+    "title": "2026. évi XLIX. törvény a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+    "short_name": "2026. évi XLIX. törvény",
+    "status": "in_force",
+    "issued_date": "2026-09-12",
+    "in_force_date": "2027-01-02",
+    "url": "https://njt.hu/jogszabaly/2026-49-00-00",
+    "description": "a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-69-00-00",
+    "title": "2024. évi LXIX. törvény Magyarország kiberbiztonságáról",
+    "short_name": "2024. évi LXIX. törvény Magyarország kiberbiztonságáról",
+    "status": "in_force",
+    "issued_date": null,
+    "in_force_date": "2025-01-01",
+    "url": "https://njt.hu/jogszabaly/2024-69-00-00",
+    "description": "Magyarország kiberbiztonságáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-7-00-00",
+    "title": "2024. évi VII. törvény a kriptoeszközök piacáról",
+    "short_name": "2024. évi VII. törvény a kriptoeszközök piacáról",
+    "status": "in_force",
+    "issued_date": null,
+    "in_force_date": "2024-06-30",
+    "url": "https://njt.hu/jogszabaly/2024-7-00-00",
+    "description": "a kriptoeszközök piacáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-70-00-00",
+    "title": "2024. évi LXX. törvény a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásáról",
+    "short_name": "2024. évi LXX. törvény a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásáról",
+    "status": "in_force",
+    "issued_date": null,
+    "in_force_date": "2024-12-25",
+    "url": "https://njt.hu/jogszabaly/2024-70-00-00",
+    "description": "a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-71-00-00",
+    "title": "2024. évi LXXI. törvény a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásával összefüggő törvények módosításáról",
+    "short_name": "2024. évi LXXI. törvény a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásával összefüggő törvények módosításáról",
+    "status": "in_force",
+    "issued_date": null,
+    "in_force_date": "2024-12-21",
+    "url": "https://njt.hu/jogszabaly/2024-71-00-00",
+    "description": "a polgári nemzetbiztonsági szolgálatok személyi állományának jogállásával összefüggő törvények módosításáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-72-00-00",
+    "title": "2024. évi LXXII. törvény a polgári nemzetbiztonsági szolgálatok jogállásával összefüggő törvények módosításáról",
+    "short_name": "2024. évi LXXII. törvény a polgári nemzetbiztonsági szolgálatok jogállásával összefüggő törvények módosításáról",
+    "status": "repealed",
+    "issued_date": null,
+    "in_force_date": "2024-12-21",
+    "url": "https://njt.hu/jogszabaly/2024-72-00-00",
+    "description": "a polgári nemzetbiztonsági szolgálatok jogállásával összefüggő törvények módosításáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-73-00-00",
+    "title": "2024. évi LXXIII. törvény a digitális állammal és az okmányok digitalizációjával összefüggő egyes törvények módosításáról",
+    "short_name": "2024. évi LXXIII. törvény a digitális állammal és az okmányok digitalizációjával összefüggő egyes törvények módosításáról",
+    "status": "repealed",
+    "issued_date": null,
+    "in_force_date": "2025-01-01",
+    "url": "https://njt.hu/jogszabaly/2024-73-00-00",
+    "description": "a digitális állammal és az okmányok digitalizációjával összefüggő egyes törvények módosításáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  },
+  {
+    "id": "hu-law-2024-74-00-00",
+    "title": "2024. évi LXXIV. törvény Magyarország 2025. évi központi költségvetésének megalapozásáról",
+    "short_name": "2024. évi LXXIV. törvény Magyarország 2025. évi központi költségvetésének megalapozásáról",
+    "status": "in_force",
+    "issued_date": null,
+    "in_force_date": "2024-12-21",
+    "url": "https://njt.hu/jogszabaly/2024-74-00-00",
+    "description": "Magyarország 2025. évi központi költségvetésének megalapozásáról",
+    "tags": [
+      "KÖLTSÉGVETÉS"
+    ]
+  },
+  {
+    "id": "hu-law-2024-75-00-00",
+    "title": "2024. évi LXXV. törvény az Országgyűlésről szóló 2012. évi XXXVI. törvény és a Nemzeti Emlékezet Bizottságáról szóló 2013. évi CCXLI. törvény módosításáról",
+    "short_name": "2024. évi LXXV. törvény az Országgyűlésről szóló 2012. évi XXXVI. törvény és a Nemzeti Emlékezet Bizottságáról szóló 2013. évi CCXLI. törvény módosításáról",
+    "status": "repealed",
+    "issued_date": null,
+    "in_force_date": "2025-01-01",
+    "url": "https://njt.hu/jogszabaly/2024-75-00-00",
+    "description": "az Országgyűlésről szóló 2012. évi XXXVI. törvény és a Nemzeti Emlékezet Bizottságáról szóló 2013. évi CCXLI. törvény módosításáról",
+    "tags": [
+      "JOGSZABÁLY"
+    ]
+  }
+]

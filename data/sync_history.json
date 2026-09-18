@@ -1,0 +1,104 @@
+[
+  {
+    "timestamp": "2026-09-16T07:35:47.160Z",
+    "date_iso": "2026-09-16",
+    "date_formatted": "2026. szeptember 16.",
+    "status": "UP_TO_DATE",
+    "legislation_state_date": "2026-09-15",
+    "message": "A Nemzeti Jogszabálytár ellenőrizve és naprakész. Új jogszabály kihirdetés nem történt ezen a napon.",
+    "new_acts_count": 0,
+    "updated_acts": []
+  },
+  {
+    "timestamp": "2026-09-15T19:30:12.000Z",
+    "date_iso": "2026-09-15",
+    "date_formatted": "2026. szeptember 15.",
+    "status": "UPDATED",
+    "legislation_state_date": "2026-09-15",
+    "message": "2 új jogszabály bekerült az adatbázisba (2026. évi XLVIII. tv. ÁFA módosítás, 2026. évi XLIX. tv.).",
+    "new_acts_count": 2,
+    "updated_acts": [
+      {
+        "id": "hu-law-2026-48-00-00",
+        "documentId": "2026-48-00-00",
+        "title": "2026. évi XLVIII. törvény az általános forgalmi adóról szóló 2007. évi CXXVII. törvény módosításáról",
+        "short_name": "Áfa tv. módosítás (2026. évi XLVIII. tv.)",
+        "date": "2026-09-15",
+        "in_force_date": "2026-09-16",
+        "desc": "az általános forgalmi adóról szóló 2007. évi CXXVII. törvény módosításáról",
+        "url": "https://njt.hu/jogszabaly/2026-48-00-00"
+      },
+      {
+        "id": "hu-law-2026-49-00-00",
+        "documentId": "2026-49-00-00",
+        "title": "2026. évi XLIX. törvény a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+        "short_name": "2026. évi XLIX. tv.",
+        "date": "2026-09-12",
+        "in_force_date": "2027-01-02",
+        "desc": "a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+        "url": "https://njt.hu/jogszabaly/2026-49-00-00"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-14T03:00:00.000Z",
+    "date_iso": "2026-09-14",
+    "date_formatted": "2026. szeptember 14.",
+    "status": "UP_TO_DATE",
+    "legislation_state_date": "2026-09-14",
+    "message": "A Nemzeti Jogszabálytár ellenőrizve és naprakész. Új kihirdetés nem történt ezen a napon.",
+    "new_acts_count": 0,
+    "updated_acts": []
+  },
+  {
+    "timestamp": "2026-09-13T03:00:00.000Z",
+    "date_iso": "2026-09-13",
+    "date_formatted": "2026. szeptember 13.",
+    "status": "UP_TO_DATE",
+    "legislation_state_date": "2026-09-12",
+    "message": "A Nemzeti Jogszabálytár ellenőrizve és naprakész. Új kihirdetés nem történt ezen a napon.",
+    "new_acts_count": 0,
+    "updated_acts": []
+  },
+  {
+    "timestamp": "2026-09-12T03:00:00.000Z",
+    "date_iso": "2026-09-12",
+    "date_formatted": "2026. szeptember 12.",
+    "status": "UPDATED",
+    "legislation_state_date": "2026-09-12",
+    "message": "1 új jogszabály közzététele rögzítve az NJT-n (2026. évi XLIX. tv.).",
+    "new_acts_count": 1,
+    "updated_acts": [
+      {
+        "id": "hu-law-2026-49-00-00",
+        "documentId": "2026-49-00-00",
+        "title": "2026. évi XLIX. törvény a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+        "short_name": "2026. évi XLIX. tv.",
+        "date": "2026-09-12",
+        "in_force_date": "2027-01-02",
+        "desc": "a megye és a kormánymegbízott elnevezés alkalmazásával összefüggő egyes törvények módosításáról",
+        "url": "https://njt.hu/jogszabaly/2026-49-00-00"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-09-11T03:00:00.000Z",
+    "date_iso": "2026-09-11",
+    "date_formatted": "2026. szeptember 11.",
+    "status": "UP_TO_DATE",
+    "legislation_state_date": "2026-09-02",
+    "message": "A Nemzeti Jogszabálytár ellenőrizve és naprakész. Új kihirdetés nem történt ezen a napon.",
+    "new_acts_count": 0,
+    "updated_acts": []
+  },
+  {
+    "timestamp": "2026-09-10T03:00:00.000Z",
+    "date_iso": "2026-09-10",
+    "date_formatted": "2026. szeptember 10.",
+    "status": "UP_TO_DATE",
+    "legislation_state_date": "2026-09-02",
+    "message": "A Nemzeti Jogszabálytár ellenőrizve és naprakész. Új kihirdetés nem történt ezen a napon.",
+    "new_acts_count": 0,
+    "updated_acts": []
+  }
+]

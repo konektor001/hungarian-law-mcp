@@ -75,7 +75,7 @@ async function main(): Promise<void> {
 
   let buildDate: string | null = null;
   try {
-    const row = db.prepare("SELECT value FROM db_metadata WHERE key = 'build_date'").get() as { value: string } | undefined;
+    const row = db.prepare("SELECT value FROM db_metadata WHERE key = 'built_at' OR key = 'build_date' ORDER BY CASE WHEN key = 'built_at' THEN 1 ELSE 2 END ASC LIMIT 1").get() as { value: string } | undefined;
     buildDate = row?.value ?? null;
   } catch {
     // db_metadata table may not exist
@@ -84,13 +84,13 @@ async function main(): Promise<void> {
   if (buildDate) {
     const age = daysSince(buildDate);
     if (age !== null && age > MAX_DB_AGE_DAYS) {
-      console.log(`STALE: Database is ${age} days old (threshold: ${MAX_DB_AGE_DAYS} days)`);
+      console.log(`STALE: Database is ${age} days old (threshold: ${MAX_DB_AGE_DAYS} days, built at: ${buildDate})`);
       updatesNeeded = true;
     } else if (age !== null) {
-      console.log(`OK: Database is ${age} days old (threshold: ${MAX_DB_AGE_DAYS} days)`);
+      console.log(`OK: Database is ${age} days old (threshold: ${MAX_DB_AGE_DAYS} days, built at: ${buildDate})`);
     }
   } else {
-    console.log('WARN: No build_date in db_metadata — cannot assess age');
+    console.log('WARN: No built_at/build_date in db_metadata — cannot assess age');
   }
 
   // --- 3. Document count check ---

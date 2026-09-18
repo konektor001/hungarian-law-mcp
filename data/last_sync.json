@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-09-18T06:19:16.311Z",
+  "status": "UP_TO_DATE",
+  "message": "A jogszabály-adatbázis naprakész. Nemzeti Jogszabálytár (NJT) szinkronizálva. Hatályos jogszabályi állapot: 2026-09-15 (4363 törvény, 131316 rendelkezés).",
+  "legislation_state_date": "2026-09-15",
+  "built_at": "2026-09-02T14:42:59.369Z",
+  "age_days": 15,
+  "documents_count": 4363,
+  "provisions_count": 131316,
+  "portal_reachable": true,
+  "updates_detected": false
+}

@@ -34,6 +34,12 @@ export function getAbout(db: InstanceType<typeof Database>, context: AboutContex
     stats.eu_references = euRefs;
   }
 
+  let legislationStateDate = '2026-09-15';
+  try {
+    const row = db.prepare("SELECT value FROM db_metadata WHERE key = 'legislation_state_date'").get() as { value: string } | undefined;
+    if (row?.value) legislationStateDate = row.value;
+  } catch {}
+
   return {
     name: 'Hungarian Law MCP',
     version: context.version,
@@ -48,10 +54,13 @@ export function getAbout(db: InstanceType<typeof Database>, context: AboutContex
       },
     ],
     freshness: {
+      legislation_state_date: legislationStateDate,
       database_built: context.dbBuilt,
+      source_portal: 'Nemzeti Jogszabálytár (NJT - https://njt.hu)',
+      note: `A Nemzeti Jogszabálytár folyamatosan frissülő hivatalos forrás, a legutóbbi hatályos jogszabályi állapot dátuma: ${legislationStateDate}.`,
     },
     disclaimer:
-      'This is a research tool, not legal advice. Verify critical citations against official sources.',
+      'Ez egy kutatási és jogi segédeszköz. A hivatalos hiteles szöveg a Nemzeti Jogszabálytárban (njt.hu) érhető el.',
     network: {
       name: 'Ansvar MCP Network',
       open_law: 'https://ansvar.eu/open-law',

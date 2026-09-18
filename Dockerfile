@@ -8,7 +8,8 @@ COPY package*.json ./
 RUN npm ci --ignore-scripts
 COPY tsconfig.json ./
 COPY src ./src
-RUN npm run build
+COPY scripts ./scripts
+RUN npm run build && npx tsc scripts/daily-sync.ts --outDir dist/scripts --target ES2022 --module NodeNext --moduleResolution NodeNext --esModuleInterop
 
 # ── Stage 2: Production ────────────────────────────────────────────────
 FROM node:20-alpine AS production
@@ -24,4 +25,4 @@ RUN addgroup -S nodejs && adduser -S nodejs -G nodejs \
 USER nodejs
 
 ENV NODE_ENV=production
-CMD ["node", "dist/http-server.js"]
+CMD ["node", "dist/src/http-server.js"]

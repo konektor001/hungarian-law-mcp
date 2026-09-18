@@ -44,7 +44,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
+function findPackageJson(): any {
+  const candidates = [
+    join(__dirname, '..', 'package.json'),
+    join(__dirname, '..', '..', 'package.json'),
+    join(process.cwd(), 'package.json'),
+  ];
+  for (const p of candidates) {
+    if (existsSync(p)) {
+      try {
+        return JSON.parse(readFileSync(p, 'utf-8'));
+      } catch { /* fallback */ }
+    }
+  }
+  return { name: 'hungarian-law-mcp', version: '1.0.0' };
+}
+
+const pkg = findPackageJson();
 const SERVER_NAME: string = pkg.name.replace(/^@ansvar\//, '');
 const SERVER_VERSION: string = pkg.version;
 
@@ -158,13 +174,74 @@ async function main() {
         return;
       }
 
-      // GET /health
-      if (url.pathname === '/health' && req.method === 'GET') {
+      // GET /health és GET /api/status — Szerver és Jogszabály-adatbázis állapot
+      if ((url.pathname === '/health' || url.pathname === '/api/status') && req.method === 'GET') {
         let dbOk = false;
+        let dbBuiltAt = dbBuilt;
+        let docsCount = 0;
+        let provsCount = 0;
+        let syncInfo: any = null;
+
         try {
           db.prepare('SELECT 1').get();
           dbOk = true;
-        } catch { /* DB not healthy */ }
+
+          const metaRow = db.prepare("SELECT value FROM db_metadata WHERE key IN ('built_at', 'build_date') ORDER BY CASE WHEN key = 'built_at' THEN 1 ELSE 2 END ASC LIMIT 1").get() as { value: string } | undefined;
+          if (metaRow?.value) dbBuiltAt = metaRow.value;
+
+          const dRow = db.prepare("SELECT count(*) as c FROM legal_documents").get() as { c: number } | undefined;
+          docsCount = dRow?.c ?? 0;
+
+          const pRow = db.prepare("SELECT count(*) as c FROM legal_provisions").get() as { c: number } | undefined;
+          provsCount = pRow?.c ?? 0;
+        } catch { /* DB hiba */ }
+
+        // Last sync infó beolvasása ha létezik
+        try {
+          const syncCandidates = [
+            join(__dirname, '..', 'data', 'last_sync.json'),
+            join(__dirname, '..', '..', 'data', 'last_sync.json'),
+            join(process.cwd(), 'data', 'last_sync.json'),
+          ];
+          const syncPath = syncCandidates.find(p => existsSync(p));
+          if (syncPath) {
+            syncInfo = JSON.parse(readFileSync(syncPath, 'utf-8'));
+          }
+        } catch { /* nem kritikus */ }
+
+        let legislationStateDate = syncInfo?.legislation_state_date || 'Ismeretlen';
+        try {
+          const legRow = db.prepare("SELECT value FROM db_metadata WHERE key = 'legislation_state_date'").get() as { value: string } | undefined;
+          if (legRow?.value) legislationStateDate = legRow.value;
+        } catch { /* DB hiba */ }
+
+        // Sync history beolvasása ha létezik
+        let syncHistory: any[] = [];
+        try {
+          const histCandidates = [
+            join(__dirname, '..', 'data', 'sync_history.json'),
+            join(__dirname, '..', '..', 'data', 'sync_history.json'),
+            join(process.cwd(), 'data', 'sync_history.json'),
+          ];
+          const histPath = histCandidates.find(p => existsSync(p));
+          if (histPath) {
+            syncHistory = JSON.parse(readFileSync(histPath, 'utf-8'));
+          }
+        } catch { /* nem kritikus */ }
+
+        // Recent laws beolvasása ha létezik
+        let recentLaws: any[] = [];
+        try {
+          const lawsCandidates = [
+            join(__dirname, '..', 'data', 'recent_laws.json'),
+            join(__dirname, '..', '..', 'data', 'recent_laws.json'),
+            join(process.cwd(), 'data', 'recent_laws.json'),
+          ];
+          const lawsPath = lawsCandidates.find(p => existsSync(p));
+          if (lawsPath) {
+            recentLaws = JSON.parse(readFileSync(lawsPath, 'utf-8'));
+          }
+        } catch { /* nem kritikus */ }
 
         res.writeHead(dbOk ? 200 : 503, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -172,7 +249,53 @@ async function main() {
           server: SERVER_NAME,
           version: SERVER_VERSION,
           uptime_seconds: Math.floor(process.uptime()),
+          database: {
+            legislation_state_date: legislationStateDate,
+            built_at: dbBuiltAt,
+            tier: meta.tier || 'free',
+            jurisdiction: 'HU',
+            source_portal: 'Nemzeti Jogszabálytár (NJT - njt.hu)',
+            documents_count: docsCount,
+            provisions_count: provsCount,
+            last_sync_at: syncInfo?.timestamp || dbBuiltAt,
+            last_sync_status: syncInfo?.status || 'UP_TO_DATE',
+            last_sync_message: syncInfo?.message || `Adatbázis aktív és működőképes (Hatályos jogszabályi állapot: ${legislationStateDate})`,
+            sync_history: syncHistory,
+            recent_laws: recentLaws,
+          },
         }));
+        return;
+      }
+
+      // POST /api/sync - Manuális szinkron indítása
+      if (url.pathname === '/api/sync' && req.method === 'POST') {
+        const syncCandidates = [
+          join(__dirname, '..', 'scripts', 'daily-sync.js'),
+          join(__dirname, 'daily-sync.js'),
+          join(__dirname, 'scripts', 'daily-sync.js'),
+          join(__dirname, '..', 'daily-sync.js'),
+        ];
+        const syncScriptPath = syncCandidates.find(p => existsSync(p)) || syncCandidates[0];
+        if (!existsSync(syncScriptPath)) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: `A daily-sync.js szkript nem található (${syncScriptPath}).` }));
+          return;
+        }
+
+        try {
+          const { exec } = await import('child_process');
+          const { promisify } = await import('util');
+          const execAsync = promisify(exec);
+          
+          await execAsync(`node "${syncScriptPath}"`);
+          
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, message: 'Szinkronizáció sikeresen lefutott' }));
+        } catch (err: any) {
+          console.error(`[${SERVER_NAME}] Szinkronizációs hiba:`, err);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: err.message || 'Hiba a szinkronizáció során' }));
+        }
         return;
       }
 
@@ -246,6 +369,39 @@ async function main() {
 
   httpServer.listen(PORT, () => {
     console.error(`${SERVER_NAME} v${SERVER_VERSION} HTTP server listening on port ${PORT}`);
+
+    if (process.env.ENABLE_BACKGROUND_SYNC === 'true') {
+      console.error(`[${SERVER_NAME}] Autonóm háttér-szinkronizáció aktív (napi ütemezés).`);
+      
+      const runSyncJob = async () => {
+        const syncCandidates = [
+          join(__dirname, '..', 'scripts', 'daily-sync.js'),
+          join(__dirname, 'daily-sync.js'),
+          join(__dirname, 'scripts', 'daily-sync.js'),
+          join(__dirname, '..', 'daily-sync.js'),
+        ];
+        const syncScriptPath = syncCandidates.find(p => existsSync(p));
+        if (!syncScriptPath) {
+          console.warn(`[${SERVER_NAME}] Háttér-szinkronizáció: daily-sync.js nem található.`);
+          return;
+        }
+
+        try {
+          const { exec } = await import('child_process');
+          const { promisify } = await import('util');
+          const execAsync = promisify(exec);
+          console.log(`[${SERVER_NAME}] Automatikus napi szinkronizáció indítása...`);
+          const { stdout } = await execAsync(`node "${syncScriptPath}"`);
+          console.log(`[${SERVER_NAME}] Napi szinkronizáció befejeződött:`, stdout.slice(-200).trim());
+        } catch (err: any) {
+          console.error(`[${SERVER_NAME}] Hiba a háttér-szinkronizáció során:`, err.message);
+        }
+      };
+
+      // Indulás után 2 perccel lefut egyszer, majd 24 óránként (86 400 000 ms)
+      setTimeout(runSyncJob, 120_000);
+      setInterval(runSyncJob, 24 * 60 * 60 * 1000);
+    }
   });
 
   // -------------------------------------------------------------------------
