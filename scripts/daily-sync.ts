@@ -282,6 +282,58 @@ async function discoverLatestFromNjt(): Promise<{
         }
       }
 
+      // Az NJT napi „CIF” oldala tartalmazza azokat a rendeleteket és
+      // utasításokat is, amelyek az általános jogszabály-keresés első
+      // oldalairól kimaradhatnak. Ezekből is építünk discovery találatot.
+      const dailyBase = new Date();
+      for (let offset = 1; offset <= 3; offset++) {
+        const dailyDate = new Date(dailyBase);
+        dailyDate.setUTCDate(dailyDate.getUTCDate() - offset);
+        const dailyStamp = dailyDate.toISOString().slice(0, 10).replace(/-/g, '');
+        const dailyController = new AbortController();
+        const dailyTimeout = setTimeout(() => dailyController.abort(), 15_000);
+        const dailyRes = await fetch(`${base}/search_cif/${dailyStamp}`, {
+          signal: dailyController.signal,
+          headers: { 'User-Agent': '@ansvar/hungarian-law-mcp/1.0 (daily-sync)' },
+        });
+        clearTimeout(dailyTimeout);
+        if (!dailyRes.ok) continue;
+
+        const dailyHtml = await dailyRes.text();
+        const dailyChunks = dailyHtml.split(/<div\s+class="resultItemWrapper"[^>]*>/i).slice(1);
+        for (const c of dailyChunks) {
+          const links = [...c.matchAll(/<a\b([^>]*)href="jogszabaly\/([^"]+)"([^>]*)>([\s\S]*?)<\/a>/gi)];
+          const titleLinkMatch = links.find(match => /(?:id="firstResult"|class="[^"]*\bnow\b[^"]*")/i.test(`${match[1]} ${match[3]}`)) || links[0];
+          if (!titleLinkMatch) continue;
+
+          const rawDocumentId = titleLinkMatch[2].split('.')[0];
+          const canonicalId = rawDocumentId.replace(/-K0-00$/, '-00-00');
+          if (!canonicalId || seenDocumentIds.has(canonicalId)) continue;
+          seenDocumentIds.add(canonicalId);
+
+          let title = titleLinkMatch[4].replace(/<[^>]+>/g, '').trim();
+          const descMatch = c.match(/<p[^>]*class="[^"]*text-small[^\"]*"[^>]*>([\s\S]*?)<\/p>/i);
+          const desc = descMatch ? descMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+          if (title && desc && !title.includes(desc)) title = `${title} ${desc}`.trim();
+          else if (!title && desc) title = desc;
+
+          const dateSpan = c.match(/<span[^>]*class="[^"]*resultDate[^\"]*"[^>]*>([\s\S]*?)<\/span>/i);
+          const matches = dateSpan
+            ? [...dateSpan[1].replace(/<[^>]+>/g, '').matchAll(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\./g)]
+              .map(match => `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`)
+            : [];
+          datesFound.push(...matches);
+          acts.push({
+            id: `hu-law-${canonicalId}`,
+            documentId: canonicalId,
+            title,
+            desc,
+            date: matches[0] || null,
+            inForceDate: matches[1] || null,
+          });
+        }
+      }
+
       const todayIso = new Date().toISOString().split('T')[0];
       const validDates = datesFound.filter(d => d <= todayIso);
       validDates.sort().reverse();
