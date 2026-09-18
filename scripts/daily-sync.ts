@@ -522,6 +522,72 @@ function loadOrCreateSyncHistory(newEntry?: SyncHistoryEntry): SyncHistoryEntry[
   return history.slice(0, 30);
 }
 
+function toSyncHistoryLaw(act: DiscoveredAct): SyncHistoryLaw {
+  const shortName = act.title.match(/^\d{4}\.\s*évi\s+[IVXLCDM]+\.\s*törvény/i)?.[0] || act.title;
+  return {
+    id: act.id,
+    documentId: act.documentId,
+    title: act.title,
+    short_name: shortName,
+    date: act.date,
+    in_force_date: act.inForceDate,
+    desc: act.desc || act.title,
+    url: `https://njt.jog.gov.hu/jogszabaly/${act.documentId}`,
+  };
+}
+
+/**
+ * A napi futás sokszor csak a következő napon látja az NJT előző napi
+ * közzétételét. Ilyenkor a tegnapi history-bejegyzést is visszatöltjük a
+ * tényleges NJT-találatokkal, különben a modal „nem volt új kihirdetés”-t
+ * mutat akkor is, ha a hivatalos napi oldal már tartalmazza a jogszabályt.
+ */
+function backfillPreviousSyncEntry(
+  history: SyncHistoryEntry[],
+  todayIso: string,
+  latestDate: string | null,
+  acts: DiscoveredAct[],
+): SyncHistoryEntry[] {
+  if (!latestDate || acts.length === 0) return history;
+
+  const relevantActs = acts
+    .filter(act => act.date === latestDate || act.inForceDate === latestDate)
+    .map(toSyncHistoryLaw);
+  if (relevantActs.length === 0) return history;
+
+  const today = new Date(`${todayIso}T12:00:00Z`);
+  if (Number.isNaN(today.getTime())) return history;
+  const target = new Date(today);
+  if (latestDate < todayIso) target.setUTCDate(target.getUTCDate() - 1);
+  const targetIso = target.toISOString().split('T')[0];
+
+  let entry = history.find(item => item.date_iso === targetIso);
+  if (!entry) {
+    entry = {
+      timestamp: new Date(`${targetIso}T23:59:59.000Z`).toISOString(),
+      date_iso: targetIso,
+      date_formatted: formatHungarianDateOnly(targetIso),
+      status: 'UP_TO_DATE',
+      legislation_state_date: latestDate,
+      message: '',
+      new_acts_count: 0,
+      updated_acts: [],
+    };
+    history.push(entry);
+  }
+
+  const existing = new Map((entry.updated_acts || []).map(act => [act.id, act]));
+  for (const law of relevantActs) existing.set(law.id, law);
+  entry.updated_acts = [...existing.values()];
+  entry.new_acts_count = Math.max(entry.new_acts_count || 0, entry.updated_acts.length);
+  entry.legislation_state_date = latestDate;
+  entry.status = 'UPDATED';
+  entry.message = `${entry.updated_acts.length} NJT-ben közzétett vagy módosított jogszabály rögzítve (${latestDate} állapotdátum).`;
+
+  history.sort((a, b) => b.date_iso.localeCompare(a.date_iso));
+  return history.slice(0, 30);
+}
+
 async function runDailySync(): Promise<void> {
   const isForce = process.argv.includes('--force');
   console.log('===========================================================');
@@ -745,9 +811,15 @@ async function runDailySync(): Promise<void> {
 
   // Történet mentése a sync_history.json fájlba (7-30 nap)
   const fullHistory = loadOrCreateSyncHistory(currentRunEntry);
+  const historyWithBackfill = backfillPreviousSyncEntry(
+    fullHistory,
+    todayIso,
+    discovery.latestDate,
+    discovery.acts,
+  );
   try {
-    writeFileSync(SYNC_HISTORY_PATH, JSON.stringify(fullHistory, null, 2), 'utf-8');
-    console.log(`[SIKER] Szinkronizációs történet mentve (${fullHistory.length} nap): ${SYNC_HISTORY_PATH}`);
+    writeFileSync(SYNC_HISTORY_PATH, JSON.stringify(historyWithBackfill, null, 2), 'utf-8');
+    console.log(`[SIKER] Szinkronizációs történet mentve (${historyWithBackfill.length} nap): ${SYNC_HISTORY_PATH}`);
   } catch (err) {
     console.error(`[FIGYELMEZTETÉS] Nem sikerült menteni a sync_history.json-t:`, err);
   }
